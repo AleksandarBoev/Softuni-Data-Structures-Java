@@ -5,23 +5,23 @@ import interfaces.AbstractTree;
 import java.util.*;
 
 public class Tree<E> implements AbstractTree<E> {
+    private static final String ELEMENT_NOT_FOUND_MESSAGE = "Element not found!";
+
     private E value;
     private List<Tree<E>> children;
-    private HashMap<E, Tree<E>> childrenValueNodeMap; //TODO finish up the methods addChild, removeNode and swap.
 
     public Tree(E value, Tree<E>... subTrees) {
         this.value = value;
         children = new ArrayList<>(Arrays.asList(subTrees));
-
-        childrenValueNodeMap = new HashMap<>(children.size());
-        for (Tree<E> child : children) {
-            childrenValueNodeMap.put(child.value, child);
-        }
     }
 
     @Override
     public List<E> orderBfs() {
         ArrayList<E> result = new ArrayList<>();
+
+        if (this.value == null) {
+            return result;
+        }
 
         ArrayDeque<Tree<E>> treeQueue = new ArrayDeque<>();
         treeQueue.offer(this);
@@ -53,23 +53,47 @@ public class Tree<E> implements AbstractTree<E> {
 
     @Override
     public void removeNode(E nodeKey) {
-        try {
-            Tree<E> parentTree = findParentTreeByChildValueThrowExceptionIfNotFound(nodeKey);
+        Tree<E> parentTree = findParentTreeByChildValue(nodeKey);
 
-            if (parentTree == null) {
-                this.value = null;
-                this.children = new ArrayList<>();
-            } else {
-                this.children = new ArrayList<>();
-            }
-        } catch (NodeNotFoundException nnfe) {
-
+        if (parentTree == null) { // if the root is the searched tree
+            this.value = null;
+            this.children = new ArrayList<>();
+        } else {
+            int indexOfTreeToRemove = parentTree.getChildIndex(nodeKey);
+            parentTree.children.remove(indexOfTreeToRemove);
         }
     }
 
     @Override
     public void swap(E firstKey, E secondKey) {
+        Tree<E> firstParent = findParentTreeByChildValue(firstKey);
+        Tree<E> secondParent = findParentTreeByChildValue(secondKey);
 
+        if (firstParent == null) { //firstElement is root
+            Tree<E> newRoot = secondParent.children.get(secondParent.getChildIndex(secondKey));
+            this.value = newRoot.value;
+            this.children = newRoot.children;
+            return;
+        }
+
+        if (secondParent == null) { //secondElement is root
+            Tree<E> newRoot = firstParent.children.get(firstParent.getChildIndex(firstKey));
+            this.value = newRoot.value;
+            this.children = newRoot.children;
+            return;
+        }
+
+        //TODO hmm, something ain't working right. And again - something not working correctly. Check out the tests
+
+        int firstIndex = firstParent.getChildIndex(firstKey);
+        int secondIndex = secondParent.getChildIndex(secondKey);
+
+        Tree<E> temp = firstParent.children.get(firstIndex);
+        firstParent.children.set(firstIndex, secondParent.children.get(secondIndex));
+        secondParent.children.set(secondIndex, temp);
+//        E temp = firstParent.children.get(firstIndex).value;
+//        firstParent.children.get(firstIndex).value = secondParent.children.get(secondIndex).value;
+//        secondParent.children.get(secondIndex).value = temp;
     }
 
     private void orderDfs(Tree<E> currentTree, List<E> values) {
@@ -99,7 +123,7 @@ public class Tree<E> implements AbstractTree<E> {
         return null;
     }
 
-    private Tree<E> findParentTreeByChildValueThrowExceptionIfNotFound(E childValue) {
+    public Tree<E> findParentTreeByChildValue(E childValue) {
         if (this.value.equals(childValue)) {
             return null;
         }
@@ -119,11 +143,17 @@ public class Tree<E> implements AbstractTree<E> {
             treeQueue.addAll(currentTree.children);
         }
 
-        throw new NodeNotFoundException();
+        throw new IllegalArgumentException(ELEMENT_NOT_FOUND_MESSAGE);
     }
 
-    private static class NodeNotFoundException extends RuntimeException {
+    private int getChildIndex(E value) {
+        for (int i = 0; i < children.size(); i++) {
+            if (children.get(i).value.equals(value)) {
+                return i;
+            }
+        }
 
+        return -1;
     }
 }
 
