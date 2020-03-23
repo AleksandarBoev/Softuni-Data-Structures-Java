@@ -51,8 +51,10 @@ public class Tree<E> implements AbstractTree<E> {
 
     @Override
     public List<E> getMiddleKeys() {
-        //TODO
-        return null;
+        return getAllTreesDFS().stream()
+                .filter(t -> t.hasParentAndAnyChildren())
+                .map(t -> t.key)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -101,10 +103,27 @@ public class Tree<E> implements AbstractTree<E> {
         return listOfPathsWithGivenSum;
     }
 
+    // Not optimal solution. Sums are calculated multiple times.
+    // Solution would be for each tree to have a field to hold the value of sum
+    // and each time a new tree is created, all of it's parents would have to increase their sums
+    // with the value of the new tree. But that would slow down a more important method - adding a new tree.
     @Override
     public List<Tree<E>> subTreesWithGivenSum(int sum) {
-        //TODO
-        return null;
+        List<Tree<E>> allTrees = getAllTreesDFS();
+
+        return allTrees.stream()
+                .filter(t -> t.getSum() == sum)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     *
+     * @return sum of current tree and all subtrees
+     */
+    private int getSum() {
+        return getAllTreesDFS().stream()
+                .map(t -> (Integer)t.key)
+                .reduce(0, (accumulator, element) -> accumulator += element);
     }
 
     private void getAsString(Tree<E> currentTree, int indentation, StringBuilder stringBuilder) {
@@ -125,21 +144,26 @@ public class Tree<E> implements AbstractTree<E> {
         return result.toString();
     }
 
-    private List<Tree<E>> getLeafs() {
+    /**
+     *
+     * @return current tree and subtrees in pre-order (root -> left -> right).
+     */
+    private List<Tree<E>> getAllTreesDFS() {
         List<Tree<E>> result = new ArrayList<>();
-        getLeafs(this, result);
+        getAllTreesDFS(this, result);
         return result;
     }
 
-    private void getLeafs(Tree<E> currentTree, List<Tree<E>> leafs) {
-        if (currentTree.children.isEmpty()) {
-            leafs.add(currentTree);
-            return;
-        }
+    private void getAllTreesDFS(Tree<E> currentTree, List<Tree<E>> allTrees) {
+        allTrees.add(currentTree);
 
         for (Tree<E> child : currentTree.children) {
-            getLeafs(child, leafs);
+            getAllTreesDFS(child, allTrees);
         }
+    }
+
+    private List<Tree<E>> getLeafs() {
+        return getAllTreesDFS().stream().filter(t -> t.children.isEmpty()).collect(Collectors.toList());
     }
 
     /**
@@ -158,6 +182,10 @@ public class Tree<E> implements AbstractTree<E> {
         return levelCounter;
     }
 
+    /**
+     *
+     * @return list of tree keys from root to current tree inclusive
+     */
     private List<E> getPath() {
         ArrayDeque<E> stack = new ArrayDeque<>();
         Tree<E> currentTree = this;
@@ -168,6 +196,10 @@ public class Tree<E> implements AbstractTree<E> {
         }
 
         return new ArrayList<>(stack);
+    }
+
+    private boolean hasParentAndAnyChildren() {
+        return this.parent != null && !this.children.isEmpty();
     }
 }
 
