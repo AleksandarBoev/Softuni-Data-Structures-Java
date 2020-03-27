@@ -36,4 +36,18 @@ public class PriorityQueueTest {
             assertEquals(expected[index++], queue.poll());
         }
     }
+
+    @Test
+    public void testPollMultipleElements2() {
+        this.queue = new PriorityQueue<>();
+        List<Integer> elements = new ArrayList<>(List.of(1, 2, 3, 4, 5));
+        for (Integer element : elements) {
+            this.queue.add(element);
+        }
+
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            elements.get(i);
+            assertEquals(elements.get(i), queue.poll());
+        }
+    }
 }

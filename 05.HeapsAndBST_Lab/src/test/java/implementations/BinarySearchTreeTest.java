@@ -68,4 +68,13 @@ public class BinarySearchTreeTest {
         assertEquals(Integer.valueOf(1), left.value);
         assertEquals(Integer.valueOf(8), right.value);
     }
+
+    @Test
+    public void insert_whenAddingTwoEqualElements_onlyOneStays() {
+        AbstractBinarySearchTree<Integer> binarySearchTree = new BinarySearchTree<>();
+        binarySearchTree.insert(1);
+        binarySearchTree.insert(1);
+
+        assertTrue(binarySearchTree.contains(Integer.valueOf(1)));
+    }
 }

@@ -47,7 +47,7 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
     @Override
     public List<AbstractBinaryTree<E>> preOrder() {
         List<AbstractBinaryTree<E>> result = new ArrayList<>();
-        preOrder(this, result);
+        preOrderAddToList(this, result);
         return result;
     }
 
@@ -88,14 +88,14 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
         asIndentedPreOrder(currentTree.getRight(), indent + 2, builder);
     }
 
-    private void preOrder(BinaryTree<E> currentTree, List<AbstractBinaryTree<E>> trees) {
+    private void preOrderAddToList(BinaryTree<E> currentTree, List<AbstractBinaryTree<E>> trees) {
         if (currentTree == null) {
             return;
         }
 
         trees.add(currentTree);
-        preOrder(currentTree.left, trees);
-        preOrder(currentTree.right, trees);
+        preOrderAddToList(currentTree.left, trees);
+        preOrderAddToList(currentTree.right, trees);
     }
 
     private void inOrder(BinaryTree<E> currentTree, List<AbstractBinaryTree<E>> trees) {

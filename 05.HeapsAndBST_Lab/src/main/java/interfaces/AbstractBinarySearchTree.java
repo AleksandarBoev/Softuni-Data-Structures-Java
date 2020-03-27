@@ -3,7 +3,7 @@ package interfaces;
 import implementations.BinarySearchTree;
 
 public interface AbstractBinarySearchTree<E extends Comparable<E>> {
-    public static class Node<E> {
+    public static class Node<E extends Comparable<E>> implements Comparable<Node<E>> {
         public E value;
         public Node<E> leftChild;
         public Node<E> rightChild;
@@ -16,6 +16,11 @@ public interface AbstractBinarySearchTree<E extends Comparable<E>> {
             this.value = value;
             this.leftChild = leftChild;
             this.rightChild = rightChild;
+        }
+
+        @Override
+        public int compareTo(Node<E> otherNode) {
+            return this.value.compareTo(otherNode.value);
         }
     }
 
