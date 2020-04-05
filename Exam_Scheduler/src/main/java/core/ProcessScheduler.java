@@ -37,12 +37,12 @@ public class ProcessScheduler implements Scheduler {
 
         Task removedTask = head.value;
         head = head.next;
-        size--;
 
-        if (size == 0) {
+        if (head == null) {
             tail = null;
         }
-
+        
+        size--;
         return removedTask;
     }
 
@@ -111,6 +111,8 @@ public class ProcessScheduler implements Scheduler {
             nodeFound.prev = newNode;
             newNode.next = nodeFound;
         }
+
+        size++;
     }
 
     @Override
@@ -128,6 +130,8 @@ public class ProcessScheduler implements Scheduler {
             nodeFound.next = newNode;
             newNode.prev = nodeFound;
         }
+
+        size++;
     }
 
     @Override
@@ -185,9 +189,10 @@ public class ProcessScheduler implements Scheduler {
     public List<Task> toList() {
         List<Task> result = new ArrayList<>(size);
 
-        Iterator<Task> iterator = this.iterator();
-        while (this.iterator().hasNext()) {
-            result.add(iterator.next());
+        Node currentNode = head;
+        while (currentNode != null) {
+            result.add(currentNode.value);
+            currentNode = currentNode.next;
         }
 
         return result;
@@ -195,9 +200,17 @@ public class ProcessScheduler implements Scheduler {
 
     @Override
     public void reverse() {
-        for (int i = 0; i < size; i++) {
-            add(process());
+        Node prev = null;
+        Node current = head;
+        Node next = null;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
         }
+
+        head = prev;
     }
 
     @Override

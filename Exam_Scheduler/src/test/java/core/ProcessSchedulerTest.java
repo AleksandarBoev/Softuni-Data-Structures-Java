@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Scheduler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class ProcessSchedulerTest {
@@ -102,5 +105,43 @@ public class ProcessSchedulerTest {
         assertNotNull(task);
         assertEquals(1, task.getId());
         assertEquals(19, scheduler.size());
+    }
+
+    //__________________________________________________
+
+    @Test
+    public void testAddingStuff() {
+        this.scheduler = new ProcessScheduler();
+        for (int i = 1; i <= 3; i++) {
+            this.scheduler.add(new ScheduledTask(i, "descr " + i));
+        }
+
+//        (this.scheduler.process());
+        this.scheduler.process();
+        this.scheduler.process();
+    }
+
+    @Test
+    public void testReverse() {
+        this.scheduler = new ProcessScheduler();
+        for (int i = 1; i <= 3; i++) {
+            this.scheduler.add(new ScheduledTask(i, "descr " + i));
+        }
+
+        List<Task> expected = new ArrayList<>();
+        expected.add(new ScheduledTask(3, ""));
+        expected.add(new ScheduledTask(2, ""));
+        expected.add(new ScheduledTask(1, ""));
+
+        this.scheduler.reverse();
+        assertSizesAndContent(expected, this.scheduler.toList());
+    }
+
+    private void assertSizesAndContent(List<Task> expected, List<Task> actual) {
+        assertEquals("Wrong sizes!", expected.size(), actual.size());
+
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals("Wrong task ids!", expected.get(i).getId(), actual.get(i).getId());
+        }
     }
 }
