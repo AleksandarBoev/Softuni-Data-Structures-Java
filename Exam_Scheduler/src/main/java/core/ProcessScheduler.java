@@ -17,8 +17,7 @@ public class ProcessScheduler implements Scheduler {
     public void add(Task task) {
         if (size == 0) {
             Node onlyNode = new Node(null, null, task);
-            head = onlyNode;
-            tail = onlyNode;
+            head = tail = onlyNode;
             size++;
             return;
         }
@@ -38,10 +37,10 @@ public class ProcessScheduler implements Scheduler {
         Task removedTask = head.value;
         head = head.next;
 
-        if (head == null) {
+        if (head == null) { // only element in the structure has been removed
             tail = null;
         }
-        
+
         size--;
         return removedTask;
     }
@@ -83,8 +82,10 @@ public class ProcessScheduler implements Scheduler {
 
         if (nodeToRemove == head) {
             head = head.next;
+            head.prev = null;
         } else if (nodeToRemove == tail){
             tail = tail.prev;
+            tail.next = null;
         } else {
             nodeToRemove.prev.next = nodeToRemove.next;
             nodeToRemove.next.prev = nodeToRemove.prev;
@@ -100,7 +101,7 @@ public class ProcessScheduler implements Scheduler {
         throwExceptionIfNullNode(nodeFound);
 
         Node newNode = new Node(null, null, task);
-        if (nodeFound == head) {
+        if (nodeFound == head) { // inserting new first element
             head.prev = newNode;
             newNode.next = head;
             head = newNode;
@@ -179,12 +180,6 @@ public class ProcessScheduler implements Scheduler {
         swap(firstNode, secondNode);
     }
 
-    private void swap(Node firstNode, Node secondNode) {
-        Task temp = firstNode.value;
-        firstNode.value = secondNode.value;
-        secondNode.value = temp;
-    }
-
     @Override
     public List<Task> toList() {
         List<Task> result = new ArrayList<>(size);
@@ -226,6 +221,12 @@ public class ProcessScheduler implements Scheduler {
         return find(task.getId());
     }
 
+    private void swap(Node firstNode, Node secondNode) {
+        Task temp = firstNode.value;
+        firstNode.value = secondNode.value;
+        secondNode.value = temp;
+    }
+
     /**
      * Returns node with given id or null if not found.
      */
@@ -246,24 +247,6 @@ public class ProcessScheduler implements Scheduler {
         if (node == null) {
             throw new IllegalArgumentException();
         }
-    }
-
-    public Iterator<Task> iterator() {
-        return new Iterator<Task>() {
-            Node currentNode;
-
-            @Override
-            public boolean hasNext() {
-                return currentNode != null;
-            }
-
-            @Override
-            public Task next() {
-                Task value = currentNode.value;
-                currentNode = currentNode.next;
-                return value;
-            }
-        };
     }
 
     private static class Node {

@@ -20,14 +20,14 @@ public class MessagingSystem implements DataTransferSystem {
 
         Node currentNode = root;
         Node parentNode = null;
-        int messageToCurrentComparisonResult = 0;
+        int insertMessageToCurrentMessageComparison = 0;
         while (currentNode != null) {
-            messageToCurrentComparisonResult = Integer.compare(message.getWeight(), currentNode.value.getWeight());
+            insertMessageToCurrentMessageComparison = Integer.compare(message.getWeight(), currentNode.value.getWeight());
 
             parentNode = currentNode;
-            if (messageToCurrentComparisonResult > 0) {
+            if (insertMessageToCurrentMessageComparison > 0) {
                 currentNode = currentNode.rightChild;
-            } else if (messageToCurrentComparisonResult < 0) {
+            } else if (insertMessageToCurrentMessageComparison < 0) {
                 currentNode = currentNode.leftChild;
             } else {
                 throw new IllegalArgumentException();
@@ -37,7 +37,7 @@ public class MessagingSystem implements DataTransferSystem {
         Node newNode = new Node(message);
         newNode.parent = parentNode;
 
-        if (messageToCurrentComparisonResult > 0) {
+        if (insertMessageToCurrentMessageComparison > 0) {
             parentNode.rightChild = newNode;
         } else {
             parentNode.leftChild = newNode;
@@ -171,6 +171,25 @@ public class MessagingSystem implements DataTransferSystem {
         return result;
     }
 
+    @Override
+    public List<Message> getPreOrder() {
+        List<Message> result = new ArrayList<>();
+        preOrder(root, result);
+        return result;
+    }
+
+    @Override
+    public List<Message> getInOrder() {
+        List<Message> result = new ArrayList<>();
+        inOrder(root, result);
+        return result;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
     private void postOrder(Node currentNode, List<Message> messagesList) {
         if (currentNode == null) {
             return;
@@ -179,13 +198,6 @@ public class MessagingSystem implements DataTransferSystem {
         postOrder(currentNode.leftChild, messagesList);
         postOrder(currentNode.rightChild, messagesList);
         messagesList.add(currentNode.value);
-    }
-
-    @Override
-    public List<Message> getPreOrder() {
-        List<Message> result = new ArrayList<>();
-        preOrder(root, result);
-        return result;
     }
 
     private void preOrder(Node currentNode, List<Message> messagesList) {
@@ -198,13 +210,6 @@ public class MessagingSystem implements DataTransferSystem {
         preOrder(currentNode.rightChild, messagesList);
     }
 
-    @Override
-    public List<Message> getInOrder() {
-        List<Message> result = new ArrayList<>();
-        inOrder(root, result);
-        return result;
-    }
-
     private void inOrder(Node currentNode, List<Message> messagesList) {
         if (currentNode == null) {
             return;
@@ -213,11 +218,6 @@ public class MessagingSystem implements DataTransferSystem {
         inOrder(currentNode.leftChild, messagesList);
         messagesList.add(currentNode.value);
         inOrder(currentNode.rightChild, messagesList);
-    }
-
-    @Override
-    public int size() {
-        return size;
     }
 
     private void throwExceptionIfEmptyStructure() {
